@@ -1,5 +1,11 @@
 using dating_app_api.Data;
+using dating_app_api.Extensions;
+using dating_app_api.Interfaces;
+using dating_app_api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,12 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<DataContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"));
-});
-
 builder.Services.AddCors();
+
+builder.Services.AddApplicationService(builder.Configuration);
+
+builder.Services.AddIdentityService(builder.Configuration);
 
 var app = builder.Build();
 
@@ -24,6 +29,8 @@ app.UseCors(policy =>
 {
     policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200");
 });
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
